@@ -26,9 +26,11 @@ fun MainScreen(
     val buttonData = listOf(
         ButtonData(
             name = "Translation text",
-            onClick = {
-                navController.navigate(Screen.TranslationScreen.route)
-            }
+            onClick = { navController.navigate(Screen.TranslationScreen.route) }
+        ),
+        ButtonData(
+            name = "Smart Reply",
+            onClick = { navController.navigate(Screen.SmartReplyScreen.route) }
         )
     )
 

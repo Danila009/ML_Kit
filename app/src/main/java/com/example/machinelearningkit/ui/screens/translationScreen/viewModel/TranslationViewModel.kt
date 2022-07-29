@@ -33,14 +33,12 @@ internal class TranslationViewModel:ViewModel() {
                     .addOnSuccessListener { translatedText ->
                         trySend(translatedText)
                     }
+                    .addOnFailureListener { trySend(it.message ?: "Error") }
             }
-            .addOnFailureListener {
-                trySend(it.message ?: "Error")
-            }
+            .addOnFailureListener { trySend(it.message ?: "Error") }
 
         awaitClose {
             englishGermanTranslator.close()
         }
     }
-
 }

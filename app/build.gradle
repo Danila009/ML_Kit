@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'kotlin-kapt'
 }
 
 android {
@@ -38,6 +39,9 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion compose_version
     }
+    aaptOptions {
+        noCompress "tflite"
+    }
     packagingOptions {
         resources {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
@@ -63,5 +67,26 @@ dependencies {
     //Navigation
     implementation("androidx.navigation:navigation-compose:2.5.0")
 
+    //Work Manager
+    implementation "androidx.work:work-runtime-ktx:2.7.1"
+
+    //Room
+    def room_version = "2.4.3"
+    implementation "androidx.room:room-rxjava3:$room_version"
+    kapt("androidx.room:room-compiler:$room_version")
+
+    //Dagger
+    implementation("com.google.dagger:dagger:2.41")
+    kapt("com.google.dagger:dagger-compiler:2.40.5")
+
+    //RxJava3
+    implementation "io.reactivex.rxjava3:rxjava:3.1.5"
+    implementation "io.reactivex.rxjava3:rxandroid:3.0.0"
+
+    //MlKit translate text
     implementation 'com.google.mlkit:translate:17.0.0'
+
+    // Smart Reply
+    // Generate text replies based on previous messages
+    implementation 'com.google.mlkit:smart-reply:17.0.2'
 }
