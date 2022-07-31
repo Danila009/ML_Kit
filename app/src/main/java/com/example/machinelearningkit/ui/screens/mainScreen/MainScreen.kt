@@ -9,6 +9,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.machinelearningkit.navigation.Screen
@@ -25,12 +26,16 @@ fun MainScreen(
 
     val buttonData = listOf(
         ButtonData(
-            name = "Translation text",
+            name = "Translate text from one language to another",
             onClick = { navController.navigate(Screen.TranslationScreen.route) }
         ),
         ButtonData(
-            name = "Smart Reply",
+            name = "Generate text replies based on previous messages",
             onClick = { navController.navigate(Screen.SmartReplyScreen.route) }
+        ),
+        ButtonData(
+            name = "Detect faces and facial landmarks, now with Face Contours",
+            onClick = { navController.navigate(Screen.FaceDetectionScreen.route) }
         )
     )
 
@@ -44,7 +49,10 @@ fun MainScreen(
                 modifier = Modifier.padding(10.dp),
                 onClick = item.onClick
             ) {
-                Text(text = item.name)
+                Text(
+                    text = item.name,
+                    textAlign = TextAlign.Center
+                )
             }
         }
     }

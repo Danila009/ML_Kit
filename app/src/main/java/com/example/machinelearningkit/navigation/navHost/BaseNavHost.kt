@@ -7,10 +7,13 @@ import androidx.navigation.compose.rememberNavController
 import com.example.machinelearningkit.common.viewModel.daggerViewModel
 import com.example.machinelearningkit.di.AppComponent
 import com.example.machinelearningkit.navigation.Screen
+import com.example.machinelearningkit.ui.screens.faceDetectionScreen.FaceDetectionScreen
 import com.example.machinelearningkit.ui.screens.mainScreen.MainScreen
 import com.example.machinelearningkit.ui.screens.smartReplyScreen.SmartReplyScreen
 import com.example.machinelearningkit.ui.screens.translationScreen.TranslationScreen
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
 
+@ExperimentalPermissionsApi
 @Composable
 fun BaseNavHost(
     appComponent: AppComponent
@@ -35,6 +38,12 @@ fun BaseNavHost(
         composable(Screen.SmartReplyScreen.route){
             SmartReplyScreen(
                 viewModel = daggerViewModel { appComponent.smartReplyViewModel() }
+            )
+        }
+
+        composable(Screen.FaceDetectionScreen.route){
+            FaceDetectionScreen(
+                navController = navController
             )
         }
     }

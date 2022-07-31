@@ -6,4 +6,6 @@ sealed class Screen(val route:String){
     object TranslationScreen:Screen("translation_screen")
     // Generate text replies based on previous messages
     object SmartReplyScreen:Screen("smart_reply_screen")
+    // Detect faces and facial landmarks, now with Face Contours
+    object FaceDetectionScreen:Screen("face_detection_screen")
 }
