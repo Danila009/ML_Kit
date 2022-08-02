@@ -1,4 +1,4 @@
-package com.example.machinelearningkit.ui.view
+package com.example.machinelearningkit.ui.view.camera
 
 import android.content.Context
 import android.view.ViewGroup
@@ -6,7 +6,6 @@ import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,44 +14,51 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
-import com.example.machinelearningkit.ui.screens.faceDetectionScreen.model.PreviewScaleType
-import com.example.machinelearningkit.ui.screens.faceDetectionScreen.model.SourceInfo
-import com.example.machinelearningkit.ui.screens.faceDetectionScreen.useCase.bindAnalysisUseCase
+import com.example.machinelearningkit.ui.view.camera.model.PreviewScaleType
+import com.example.machinelearningkit.ui.view.camera.model.SourceInfo
+import com.example.machinelearningkit.ui.view.camera.useCase.bindAnalysisUseCase
+import com.example.machinelearningkit.ui.screens.faceDetectionScreen.view.DetectedFaces
+import com.example.machinelearningkit.ui.screens.poseDetectionScreen.view.DetectedPose
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.mlkit.vision.face.Face
+import com.google.mlkit.vision.pose.Pose
 
 @Composable
 fun CameraView(
     modifier: Modifier = Modifier,
     cameraLens:Int,
-    scaleType: PreviewView.ScaleType = PreviewView.ScaleType.FILL_CENTER
+    scaleType: PreviewView.ScaleType = PreviewView.ScaleType.FILL_CENTER,
+    poseDetection:Boolean = false,
+    faceDetection:Boolean = false
 ) {
 
     val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
 
     var detectedFaces by remember { mutableStateOf<List<Face>>(emptyList()) }
+    var detectedPose by remember { mutableStateOf<Pose?>(null) }
     var sourceInfo by remember { mutableStateOf(SourceInfo(10, 10, false)) }
     
     val previewView = remember { PreviewView(context) }
     val cameraProvider = remember(sourceInfo, cameraLens) {
         ProcessCameraProvider.getInstance(context)
             .configureCamera(
-                previewView, lifecycleOwner, cameraLens, context,
+                previewView = previewView,
+                lifecycleOwner = lifecycleOwner,
+                cameraLens = cameraLens,
+                context = context,
+                poseDetection = poseDetection,
+                faceDetection = faceDetection,
                 setSourceInfo = { sourceInfo = it },
                 onFacesDetected = { detectedFaces = it },
+                onPoseDetected = { detectedPose = it }
             )
     }
 
@@ -76,27 +82,15 @@ fun CameraView(
                     )
             ){
                 CameraPreview(modifier,previewView, scaleType)
-                DetectedFaces(faces = detectedFaces, sourceInfo = sourceInfo)
+                if (faceDetection){
+                    DetectedFaces(faces = detectedFaces, sourceInfo = sourceInfo)
+                }
+                if (poseDetection){
+                    DetectedPose(pose = detectedPose, sourceInfo = sourceInfo)
+                }
             }
         }
 
-    }
-}
-
-@Composable
-fun DetectedFaces(faces: List<Face>, sourceInfo: SourceInfo) {
-    Canvas(modifier = Modifier.fillMaxSize()) {
-        val needToMirror = sourceInfo.isImageFlipped
-        for (face in faces) {
-            val left =
-                if (needToMirror) size.width - face.boundingBox.right.toFloat() else face.boundingBox.left.toFloat()
-
-            drawRect(
-                Color.Gray, style = Stroke(2.dp.toPx()),
-                topLeft = Offset(left, face.boundingBox.top.toFloat()),
-                size = Size(face.boundingBox.width().toFloat(), face.boundingBox.height().toFloat())
-            )
-        }
     }
 }
 
@@ -132,8 +126,11 @@ private fun ListenableFuture<ProcessCameraProvider>.configureCamera(
     lifecycleOwner: LifecycleOwner,
     cameraLens: Int,
     context: Context,
+    poseDetection:Boolean,
+    faceDetection:Boolean,
     setSourceInfo: (SourceInfo) -> Unit,
-    onFacesDetected: (List<Face>) -> Unit
+    onFacesDetected: (List<Face>) -> Unit,
+    onPoseDetected: (Pose) -> Unit
 ): ListenableFuture<ProcessCameraProvider> {
     addListener({
         val cameraSelector = CameraSelector.Builder().requireLensFacing(cameraLens).build()
@@ -144,7 +141,14 @@ private fun ListenableFuture<ProcessCameraProvider>.configureCamera(
                 setSurfaceProvider(previewView.surfaceProvider)
             }
 
-        val analysis = bindAnalysisUseCase(cameraLens, setSourceInfo, onFacesDetected)
+        val analysis = bindAnalysisUseCase(
+            lens = cameraLens,
+            poseDetection = poseDetection,
+            faceDetection = faceDetection,
+            setSourceInfo = setSourceInfo,
+            onFacesDetected = onFacesDetected,
+            onPoseDetected = onPoseDetected
+        )
 
         val imageCapture = ImageCapture.Builder()
             .setTargetRotation(previewView.display.rotation)

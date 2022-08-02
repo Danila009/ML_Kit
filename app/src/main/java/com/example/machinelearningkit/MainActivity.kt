@@ -5,6 +5,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.example.machinelearningkit.di.DaggerAppComponent
 import com.example.machinelearningkit.navigation.navHost.BaseNavHost
+import com.example.machinelearningkit.ui.view.camera.detection.FaceDetectorProcessor
+import com.example.machinelearningkit.ui.view.camera.detection.PoseDetectorProcessor
 import com.example.machinelearningkit.ui.theme.MachineLearningKitTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 
@@ -25,5 +27,11 @@ class MainActivity : ComponentActivity() {
                 )
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        PoseDetectorProcessor().stop()
+        FaceDetectorProcessor().stop()
     }
 }

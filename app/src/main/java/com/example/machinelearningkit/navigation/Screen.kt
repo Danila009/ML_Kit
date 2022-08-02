@@ -8,4 +8,8 @@ sealed class Screen(val route:String){
     object SmartReplyScreen:Screen("smart_reply_screen")
     // Detect faces and facial landmarks, now with Face Contours
     object FaceDetectionScreen:Screen("face_detection_screen")
+    //
+    object PoseDetectionScreen:Screen("pose_detection_screen")
+    //
+    object PoseAndFaceDetectionScreen:Screen("pose_and_face_detection_screen")
 }

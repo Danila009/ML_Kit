@@ -1,5 +1,6 @@
-package com.example.machinelearningkit.ui.view
+package com.example.machinelearningkit.ui.view.camera
 
+import androidx.camera.core.CameraSelector
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -28,4 +29,10 @@ fun CameraControlsView(
             modifier = Modifier.wrapContentSize()
         ) { Icon(Icons.Filled.Cameraswitch, contentDescription = "Switch camera") }
     }
+}
+
+fun switchLens(lens: Int) = if (CameraSelector.LENS_FACING_FRONT == lens) {
+    CameraSelector.LENS_FACING_BACK
+} else {
+    CameraSelector.LENS_FACING_FRONT
 }

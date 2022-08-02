@@ -36,6 +36,14 @@ fun MainScreen(
         ButtonData(
             name = "Detect faces and facial landmarks, now with Face Contours",
             onClick = { navController.navigate(Screen.FaceDetectionScreen.route) }
+        ),
+        ButtonData(
+            name = "Detect poses",
+            onClick = { navController.navigate(Screen.PoseDetectionScreen.route) }
+        ),
+        ButtonData(
+            name = "Detect poses and faces",
+            onClick = { navController.navigate(Screen.PoseAndFaceDetectionScreen.route) }
         )
     )
 

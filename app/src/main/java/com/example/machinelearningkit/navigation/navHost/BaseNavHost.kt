@@ -9,6 +9,8 @@ import com.example.machinelearningkit.di.AppComponent
 import com.example.machinelearningkit.navigation.Screen
 import com.example.machinelearningkit.ui.screens.faceDetectionScreen.FaceDetectionScreen
 import com.example.machinelearningkit.ui.screens.mainScreen.MainScreen
+import com.example.machinelearningkit.ui.screens.poseAndFaceDetectionScreen.PostAndFaceDetectionScreen
+import com.example.machinelearningkit.ui.screens.poseDetectionScreen.PoseDetectionScreen
 import com.example.machinelearningkit.ui.screens.smartReplyScreen.SmartReplyScreen
 import com.example.machinelearningkit.ui.screens.translationScreen.TranslationScreen
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -43,6 +45,18 @@ fun BaseNavHost(
 
         composable(Screen.FaceDetectionScreen.route){
             FaceDetectionScreen(
+                navController = navController
+            )
+        }
+
+        composable(Screen.PoseDetectionScreen.route){
+            PoseDetectionScreen(
+                navController = navController
+            )
+        }
+
+        composable(Screen.PoseAndFaceDetectionScreen.route){
+            PostAndFaceDetectionScreen(
                 navController = navController
             )
         }

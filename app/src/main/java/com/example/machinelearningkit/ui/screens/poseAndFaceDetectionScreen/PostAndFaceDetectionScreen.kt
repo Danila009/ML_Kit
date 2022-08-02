@@ -1,4 +1,4 @@
-package com.example.machinelearningkit.ui.screens.faceDetectionScreen
+package com.example.machinelearningkit.ui.screens.poseAndFaceDetectionScreen
 
 import android.Manifest
 import androidx.camera.core.CameraSelector
@@ -16,8 +16,8 @@ import com.google.accompanist.permissions.rememberPermissionState
 
 @ExperimentalPermissionsApi
 @Composable
-fun FaceDetectionScreen(
-    navController: NavController
+fun PostAndFaceDetectionScreen(
+    navController:NavController
 ) {
 
     val cameraPermission = rememberPermissionState(permission = Manifest.permission.CAMERA)
@@ -31,6 +31,7 @@ fun FaceDetectionScreen(
             var lens by remember { mutableStateOf(CameraSelector.LENS_FACING_BACK) }
             CameraView(
                 cameraLens = lens,
+                poseDetection = true,
                 faceDetection = true
             )
             CameraControlsView(

@@ -1,4 +1,4 @@
-package com.example.machinelearningkit.ui.screens.faceDetectionScreen.detection
+package com.example.machinelearningkit.ui.view.camera.detection
 
 import android.annotation.SuppressLint
 import androidx.camera.core.ImageProxy
@@ -17,7 +17,11 @@ class FaceDetectorProcessor {
 
     init {
         val faceDetectorOptions = FaceDetectorOptions.Builder()
-
+            .setLandmarkMode(FaceDetectorOptions.LANDMARK_MODE_NONE)
+            .setContourMode(FaceDetectorOptions.CONTOUR_MODE_ALL)
+            .setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_NONE)
+            .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
+            .setMinFaceSize(0.4f)
             .build()
 
         detector = FaceDetection.getClient(faceDetectorOptions)
@@ -33,7 +37,7 @@ class FaceDetectorProcessor {
         onDetectionFinished:(List<Face>) -> Unit
     ){
         detector.process(InputImage.fromMediaImage(image.image!!, image.imageInfo.rotationDegrees))
-            .addOnSuccessListener { onDetectionFinished(it) }
+            .addOnSuccessListener(executor) { onDetectionFinished(it) }
             .addOnCompleteListener { image.close() }
     }
 }

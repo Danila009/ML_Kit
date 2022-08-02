@@ -1,4 +1,4 @@
-package com.example.machinelearningkit.ui.screens.faceDetectionScreen.model
+package com.example.machinelearningkit.ui.view.camera.model
 
 data class SourceInfo(
     val width: Int,
