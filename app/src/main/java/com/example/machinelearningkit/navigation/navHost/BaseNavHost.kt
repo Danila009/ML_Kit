@@ -7,6 +7,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.machinelearningkit.common.viewModel.daggerViewModel
 import com.example.machinelearningkit.di.AppComponent
 import com.example.machinelearningkit.navigation.Screen
+import com.example.machinelearningkit.ui.screens.barcodeScanningScreen.BarcodeScanningScreen
 import com.example.machinelearningkit.ui.screens.faceDetectionScreen.FaceDetectionScreen
 import com.example.machinelearningkit.ui.screens.mainScreen.MainScreen
 import com.example.machinelearningkit.ui.screens.poseAndFaceDetectionScreen.PostAndFaceDetectionScreen
@@ -45,6 +46,12 @@ fun BaseNavHost(
 
         composable(Screen.FaceDetectionScreen.route){
             FaceDetectionScreen(
+                navController = navController
+            )
+        }
+
+        composable(Screen.BarcodeScanningScreen.route){
+            BarcodeScanningScreen(
                 navController = navController
             )
         }

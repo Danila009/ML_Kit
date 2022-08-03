@@ -21,22 +21,27 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
+import com.example.machinelearningkit.ui.screens.barcodeScanningScreen.view.DetectedBarcode
 import com.example.machinelearningkit.ui.view.camera.model.PreviewScaleType
 import com.example.machinelearningkit.ui.view.camera.model.SourceInfo
 import com.example.machinelearningkit.ui.view.camera.useCase.bindAnalysisUseCase
 import com.example.machinelearningkit.ui.screens.faceDetectionScreen.view.DetectedFaces
 import com.example.machinelearningkit.ui.screens.poseDetectionScreen.view.DetectedPose
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.common.util.concurrent.ListenableFuture
+import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.face.Face
 import com.google.mlkit.vision.pose.Pose
 
+@ExperimentalPermissionsApi
 @Composable
 fun CameraView(
     modifier: Modifier = Modifier,
     cameraLens:Int,
     scaleType: PreviewView.ScaleType = PreviewView.ScaleType.FILL_CENTER,
     poseDetection:Boolean = false,
-    faceDetection:Boolean = false
+    faceDetection:Boolean = false,
+    barcodeScanner:Boolean = false
 ) {
 
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -44,6 +49,7 @@ fun CameraView(
 
     var detectedFaces by remember { mutableStateOf<List<Face>>(emptyList()) }
     var detectedPose by remember { mutableStateOf<Pose?>(null) }
+    var detectedBarcode by remember { mutableStateOf<List<Barcode>?>(null) }
     var sourceInfo by remember { mutableStateOf(SourceInfo(10, 10, false)) }
     
     val previewView = remember { PreviewView(context) }
@@ -56,9 +62,11 @@ fun CameraView(
                 context = context,
                 poseDetection = poseDetection,
                 faceDetection = faceDetection,
+                barcodeScanner = barcodeScanner,
                 setSourceInfo = { sourceInfo = it },
                 onFacesDetected = { detectedFaces = it },
-                onPoseDetected = { detectedPose = it }
+                onPoseDetected = { detectedPose = it },
+                onBarcodeDetected = { detectedBarcode = it }
             )
     }
 
@@ -87,6 +95,9 @@ fun CameraView(
                 }
                 if (poseDetection){
                     DetectedPose(pose = detectedPose, sourceInfo = sourceInfo)
+                }
+                if (barcodeScanner){
+                    DetectedBarcode(barcodes = detectedBarcode, sourceInfo = sourceInfo)
                 }
             }
         }
@@ -128,9 +139,11 @@ private fun ListenableFuture<ProcessCameraProvider>.configureCamera(
     context: Context,
     poseDetection:Boolean,
     faceDetection:Boolean,
+    barcodeScanner:Boolean,
     setSourceInfo: (SourceInfo) -> Unit,
     onFacesDetected: (List<Face>) -> Unit,
-    onPoseDetected: (Pose) -> Unit
+    onPoseDetected: (Pose) -> Unit,
+    onBarcodeDetected:(List<Barcode>) -> Unit
 ): ListenableFuture<ProcessCameraProvider> {
     addListener({
         val cameraSelector = CameraSelector.Builder().requireLensFacing(cameraLens).build()
@@ -145,9 +158,11 @@ private fun ListenableFuture<ProcessCameraProvider>.configureCamera(
             lens = cameraLens,
             poseDetection = poseDetection,
             faceDetection = faceDetection,
+            barcodeScanner = barcodeScanner,
             setSourceInfo = setSourceInfo,
             onFacesDetected = onFacesDetected,
-            onPoseDetected = onPoseDetected
+            onPoseDetected = onPoseDetected,
+            onBarcodeDetected = onBarcodeDetected
         )
 
         val imageCapture = ImageCapture.Builder()
