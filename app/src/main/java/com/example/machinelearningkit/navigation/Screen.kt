@@ -13,5 +13,6 @@ sealed class Screen(val route:String){
     //
     object PoseAndFaceDetectionScreen:Screen("pose_and_face_detection_screen")
     //Scan and process barcodes
-    object  BarcodeScanningScreen:Screen("barcode_scanning_screen")
+    object BarcodeScanningScreen:Screen("barcode_scanning_screen")
+    object BarcodeGenerateScreen:Screen("barcode_generator_screen")
 }

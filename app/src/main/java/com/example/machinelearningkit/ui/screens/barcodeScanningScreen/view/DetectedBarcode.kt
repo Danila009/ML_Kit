@@ -3,11 +3,12 @@ package com.example.machinelearningkit.ui.screens.barcodeScanningScreen.view
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.net.Uri
+import android.provider.CalendarContract
 import android.widget.Toast
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.AbsoluteRoundedCornerShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.OutlinedButton
@@ -22,9 +23,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.machinelearningkit.common.connect.wifiConnect
 import com.example.machinelearningkit.common.extensions.copyText
+import com.example.machinelearningkit.common.intentEmail
+import com.example.machinelearningkit.common.intentPhone
+import com.example.machinelearningkit.common.intentUrl
 import com.example.machinelearningkit.ui.view.camera.model.SourceInfo
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
@@ -55,6 +60,7 @@ fun DetectedBarcode(barcodes: List<Barcode>?, sourceInfo: SourceInfo) {
                 Barcode.TYPE_EMAIL -> BarcodeTypeEmail(barcode)
                 Barcode.TYPE_SMS -> BarcodeTypeSms(barcode)
                 Barcode.TYPE_CALENDAR_EVENT -> BarcodeTypeCalendarEvent(barcode)
+                Barcode.TYPE_CONTACT_INFO -> BarcodeTypeContactInfo(barcode)
                 else -> {
                     AlertDialogBarcode(
                         barcodeResult = rawValue
@@ -97,9 +103,209 @@ fun DetectedBarcode(barcodes: List<Barcode>?, sourceInfo: SourceInfo) {
     }
 }
 
+@ExperimentalPermissionsApi
+@Composable
+fun BarcodeTypeContactInfo(barcode: Barcode) {
+    val context = LocalContext.current
+
+    val permissionCallPhone = rememberPermissionState(permission = Manifest.permission.CALL_PHONE)
+
+    val title = barcode.contactInfo?.title ?: ""
+    val addresses = barcode.contactInfo?.addresses ?: emptyList()
+    val emails = barcode.contactInfo?.emails ?: emptyList()
+    val name = barcode.contactInfo?.name
+    val phones = barcode.contactInfo?.phones ?: emptyList()
+    val organization = barcode.contactInfo?.organization ?: ""
+    val urls = barcode.contactInfo?.urls ?: emptyList()
+
+    AlertDialogBarcode {
+        LazyColumn(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            item {
+                name?.let {
+                    if ((name.first ?: "").isNotEmpty()){
+                        Text(
+                            text = "First name",
+                            fontWeight = FontWeight.W900
+                        )
+
+                        BaseOutlinedTextField(text = name.first)
+                    }
+                    if ((name.last ?: "").isNotEmpty()){
+                        Text(
+                            text = "Last name",
+                            fontWeight = FontWeight.W900
+                        )
+
+                        BaseOutlinedTextField(text = name.last)
+                    }
+                    if ((name.formattedName ?: "").isNotEmpty()){
+                        Text(
+                            text = "Formatted name",
+                            fontWeight = FontWeight.W900
+                        )
+
+                        BaseOutlinedTextField(text = name.formattedName)
+                    }
+                    if ((name.middle ?: "").isNotEmpty()){
+                        Text(
+                            text = "Middle",
+                            fontWeight = FontWeight.W900
+                        )
+
+                        BaseOutlinedTextField(text = name.middle)
+                    }
+                    if ((name.prefix ?: "").isNotEmpty()){
+                        Text(
+                            text = "Prefix",
+                            fontWeight = FontWeight.W900
+                        )
+
+                        BaseOutlinedTextField(text = name.prefix)
+                    }
+                    if ((name.pronunciation ?: "").isNotEmpty()){
+                        Text(
+                            text = "Pronunciation",
+                            fontWeight = FontWeight.W900
+                        )
+
+                        BaseOutlinedTextField(text = name.pronunciation)
+                    }
+                    if ((name.suffix ?: "").isNotEmpty()){
+                        Text(
+                            text = "Suffix",
+                            fontWeight = FontWeight.W900
+                        )
+
+                        BaseOutlinedTextField(text = name.suffix)
+                    }
+                }
+                if (title.isNotEmpty()){
+                    Text(
+                        text = "Title",
+                        fontWeight = FontWeight.W900
+                    )
+
+                    BaseOutlinedTextField(text = title)
+                }
+                if (organization.isNotEmpty()){
+                    Text(
+                        text = "Organization",
+                        fontWeight = FontWeight.W900
+                    )
+
+                    BaseOutlinedTextField(text = organization)
+                }
+                if (addresses.isNotEmpty()){
+                    Text(
+                        text = "Address",
+                        fontWeight = FontWeight.W900
+                    )
+                    addresses.forEach { address ->
+                        address.addressLines.forEach { lene ->
+                            BaseOutlinedTextField(text = lene)
+                        }
+                    }
+                }
+                if (emails.isNotEmpty()){
+                    Text(
+                        text = "Emails",
+                        fontWeight = FontWeight.W900
+                    )
+                    emails.forEach { email ->
+                        val intentEmail = intentEmail(
+                            address = email.address,
+                            subject = email.subject,
+                            body = email.address
+                        )
+
+                        BaseOutlinedTextField(text = email.address)
+
+                        OutlinedButton(onClick = {
+                            context.startActivity(intentEmail)
+                        }) {
+                            Text(text = "Open emails")
+                        }
+                    }
+                }
+
+                if (urls.isNotEmpty()){
+                    Text(
+                        text = "Urls",
+                        fontWeight = FontWeight.W900
+                    )
+
+                    urls.forEach { url ->
+                        val intentUrl = intentUrl(url)
+
+                        BaseOutlinedTextField(text = url)
+
+                        OutlinedButton(onClick = {
+                            context.startActivity(intentUrl)
+                        }) {
+                            Text(text = "Open website")
+                        }
+                    }
+                }
+
+                if (phones.isNotEmpty()){
+                    Text(
+                        text = "Phones",
+                        fontWeight = FontWeight.W900
+                    )
+
+                    phones.forEach { phone ->
+                        val intentPhone = intentPhone(phone.number)
+
+                        BaseOutlinedTextField(text = phone.number)
+
+                        OutlinedButton(onClick = {
+                            permissionCallPhone.launchPermissionRequest()
+                            if (permissionCallPhone.hasPermission){
+                                context.startActivity(intentPhone)
+                            }
+                        }) {
+                            Text(text = "Call phone")
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 @Composable
 fun BarcodeTypeCalendarEvent(barcode: Barcode) {
-    
+    val context = LocalContext.current
+
+    val startDate = barcode.calendarEvent?.start
+    val endDate = barcode.calendarEvent?.end
+    val description = barcode.calendarEvent?.description
+    val location = barcode.calendarEvent?.location
+    val organizer = barcode.calendarEvent?.organizer
+    val status = barcode.calendarEvent?.status
+    val summary = barcode.calendarEvent?.summary
+
+    val intent = Intent(Intent.ACTION_INSERT)
+    intent.apply {
+        data = CalendarContract.Events.CONTENT_URI
+        putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, startDate?.rawValue)
+        putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endDate?.rawValue)
+        putExtra(CalendarContract.Events.TITLE, summary)
+        putExtra(CalendarContract.Events.DESCRIPTION, description)
+        putExtra(CalendarContract.Events.EVENT_LOCATION, location)
+        putExtra(CalendarContract.Events.ORGANIZER, organizer)
+        putExtra(CalendarContract.Events.STATUS, status)
+        putExtra(CalendarContract.Events.AVAILABILITY, CalendarContract.Events.AVAILABILITY_BUSY)
+    }
+
+    AlertDialogBarcode {
+        OutlinedButton(onClick = { context.startActivity(intent) }) {
+            Text(text = "Open calendar")
+        }
+    }
 }
 
 @Composable
@@ -126,13 +332,34 @@ fun BarcodeTypeSms(barcode: Barcode) {
 }
 
 @Composable
+private fun BaseOutlinedTextField(
+    modifier: Modifier = Modifier,
+    text:String?
+) {
+    val context = LocalContext.current
+
+    OutlinedTextField(
+        modifier = modifier
+            .padding(5.dp)
+            .clickable {
+                text?.copyText(context)
+                Toast
+                    .makeText(context, "Текст скопирован", Toast.LENGTH_SHORT)
+                    .show()
+            },
+        value = text ?: "",
+        onValueChange = {  },
+        enabled = false,
+        readOnly = true
+    )
+}
+
+@Composable
 private fun AlertDialogBarcode(
     barcodeResult: String? = null,
     title: @Composable () -> Unit = {},
     buttons: @Composable () -> Unit = {},
 ){
-    val context = LocalContext.current
-
     var dialogVisible by rememberSaveable{ mutableStateOf(true) }
 
     if(dialogVisible){
@@ -140,24 +367,7 @@ private fun AlertDialogBarcode(
             shape = AbsoluteRoundedCornerShape(15.dp),
             onDismissRequest = { dialogVisible = false },
             title = title,
-            text = {
-                barcodeResult?.let {
-                    OutlinedTextField(
-                        modifier = Modifier
-                            .padding(5.dp)
-                            .clickable {
-                                barcodeResult.copyText(context)
-                                Toast
-                                    .makeText(context, "Текст скопирован", Toast.LENGTH_SHORT)
-                                    .show()
-                            },
-                        value = barcodeResult,
-                        onValueChange = {  },
-                        enabled = false,
-                        readOnly = true
-                    )   
-                }
-            },
+            text = { barcodeResult?.let { BaseOutlinedTextField(text = barcodeResult) } },
             buttons = buttons
         )
     }
@@ -175,7 +385,7 @@ private fun BarcodeTypeUrl(barcode: Barcode) {
             val url = barcode.url!!.url
 
             url?.let {
-                val intent = Intent(Intent.ACTION_VIEW).setData(Uri.parse(url))
+                val intent = intentUrl(url)
                 context.startActivity(intent)
             }
             title?.let {
@@ -265,7 +475,7 @@ private fun BarcodeTypePhone(barcode: Barcode) {
         OutlinedButton(onClick = {
             permissionCallPhone.launchPermissionRequest()
             if (permissionCallPhone.hasPermission){
-                val intentPhone = Intent(Intent.ACTION_CALL, Uri.parse("tel:$phone"))
+                val intentPhone = intentPhone(phone)
                 context.startActivity(intentPhone)
             }
         }) {
@@ -282,13 +492,7 @@ private fun BarcodeTypeEmail(barcode:Barcode){
     val subject = barcode.email?.subject
     val body = barcode.email?.body
 
-    val intent = Intent(Intent.ACTION_SENDTO)
-        .apply {
-            data = Uri.parse("mailto:")
-            putExtra(Intent.EXTRA_EMAIL, address)
-            putExtra(Intent.EXTRA_SUBJECT, subject)
-            putExtra(Intent.EXTRA_TEXT, body)
-        }
+    val intent = intentEmail(address,subject,body)
 
     AlertDialogBarcode(
         barcodeResult = "Address $address \n Subject $subject \n Body $body"

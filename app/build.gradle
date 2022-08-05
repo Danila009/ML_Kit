@@ -64,6 +64,9 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
 
+    //Material
+    implementation 'com.google.android.material:material:1.6.1'
+
     //Icon Material Compose
     implementation("androidx.compose.material:material-icons-extended:1.2.0")
 
@@ -113,6 +116,9 @@ dependencies {
 
     // Maps SDK for Android
     implementation 'com.google.android.gms:play-services-maps:18.1.0'
+
+    //
+    implementation 'com.google.zxing:core:3.4.1'
 
     // Pose detection
     implementation 'com.google.mlkit:pose-detection:18.0.0-beta2'

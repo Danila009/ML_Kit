@@ -46,8 +46,12 @@ fun MainScreen(
             onClick = { navController.navigate(Screen.PoseAndFaceDetectionScreen.route) }
         ),
         ButtonData(
-            name = " Barcode scanning",
+            name = "Barcode scanning",
             onClick = { navController.navigate(Screen.BarcodeScanningScreen.route) }
+        ),
+        ButtonData(
+            name = "QR Code Generate",
+            onClick = { navController.navigate(Screen.BarcodeGenerateScreen.route) }
         )
     )
 

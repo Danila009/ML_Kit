@@ -7,6 +7,7 @@ import android.content.Context
 import android.os.Build
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import kotlin.String
 
 fun String.copyText(context: Context){
     val sdk = Build.VERSION.SDK_INT

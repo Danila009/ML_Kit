@@ -1,8 +1,9 @@
 package com.example.machinelearningkit
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.fragment.app.FragmentActivity
 import com.example.machinelearningkit.di.DaggerAppComponent
 import com.example.machinelearningkit.navigation.navHost.BaseNavHost
 import com.example.machinelearningkit.ui.view.camera.detection.FaceDetectorProcessor
@@ -10,8 +11,9 @@ import com.example.machinelearningkit.ui.view.camera.detection.PoseDetectorProce
 import com.example.machinelearningkit.ui.theme.MachineLearningKitTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 
+@ExperimentalMaterialApi
 @ExperimentalPermissionsApi
-class MainActivity : ComponentActivity() {
+class MainActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
