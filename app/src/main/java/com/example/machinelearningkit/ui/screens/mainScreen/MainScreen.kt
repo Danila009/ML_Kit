@@ -52,6 +52,14 @@ fun MainScreen(
         ButtonData(
             name = "QR Code Generate",
             onClick = { navController.navigate(Screen.BarcodeGenerateScreen.route) }
+        ),
+        ButtonData(
+            name = "Detect, track and classify objects in live camera",
+            onClick = { navController.navigate(Screen.ObjectDetectionScreen.arguments(true)) }
+        ),
+        ButtonData(
+            name = "Detect, track and classify objects in static camera",
+            onClick = { navController.navigate(Screen.ObjectDetectionScreen.arguments(false)) }
         )
     )
 

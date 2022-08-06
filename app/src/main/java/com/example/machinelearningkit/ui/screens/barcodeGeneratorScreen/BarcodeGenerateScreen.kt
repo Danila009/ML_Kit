@@ -200,7 +200,7 @@ fun BarcodeGenerateTypeEvent(barcodeFormat: BarcodeFormat) {
 
     startTimeDialog.setTitle(R.string.app_name)
     endTimeDialog.setTitle(R.string.app_name)
-    
+
     startDateDialog.setTitle(R.string.app_name)
     endDateDialog.setTitle(R.string.app_name)
 

@@ -6,12 +6,14 @@ import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import com.example.machinelearningkit.ui.view.camera.detection.BarcodeScannerProcessor
 import com.example.machinelearningkit.ui.view.camera.detection.FaceDetectorProcessor
+import com.example.machinelearningkit.ui.view.camera.detection.ObjectDetectionProcessor
 import com.example.machinelearningkit.ui.view.camera.model.SourceInfo
 import com.example.machinelearningkit.ui.view.camera.detection.PoseDetectorProcessor
 import com.google.android.gms.tasks.TaskExecutors
 import com.google.mlkit.common.MlKitException
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.face.Face
+import com.google.mlkit.vision.objects.DetectedObject
 import com.google.mlkit.vision.pose.Pose
 
 fun bindAnalysisUseCase(
@@ -19,11 +21,24 @@ fun bindAnalysisUseCase(
     poseDetection:Boolean,
     faceDetection:Boolean,
     barcodeScanner:Boolean,
+    objectDetection:Boolean,
     setSourceInfo: (SourceInfo) -> Unit,
     onFacesDetected: (List<Face>) -> Unit,
     onPoseDetected: (Pose) -> Unit,
-    onBarcodeDetected:(List<Barcode>) -> Unit
+    onBarcodeDetected:(List<Barcode>) -> Unit,
+    onObjectDetected:(List<DetectedObject>) -> Unit
 ): ImageAnalysis? {
+
+    val objectProcessor = try {
+        if (objectDetection){
+            ObjectDetectionProcessor()
+        }else{
+            null
+        }
+    }catch (e:Exception){
+        Log.e("CAMERA", "Can not create image processor", e)
+        return null
+    }
 
     val barcodeProcessor = try {
         if (barcodeScanner){
@@ -79,6 +94,9 @@ fun bindAnalysisUseCase(
             }
             barcodeProcessor?.let {
                 barcodeProcessor.processImageProxy(imageProxy, onBarcodeDetected)
+            }
+            objectProcessor?.let {
+                objectProcessor.liveProcessImageProxy(imageProxy,onObjectDetected)
             }
         } catch (e: MlKitException) {
             Log.e(
