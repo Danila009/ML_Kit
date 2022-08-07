@@ -28,12 +28,16 @@ import com.example.machinelearningkit.ui.view.camera.useCase.bindAnalysisUseCase
 import com.example.machinelearningkit.ui.screens.faceDetectionScreen.view.DetectedFaces
 import com.example.machinelearningkit.ui.screens.objectDetectionScreen.view.DetectedObject
 import com.example.machinelearningkit.ui.screens.poseDetectionScreen.view.DetectedPose
+import com.example.machinelearningkit.ui.screens.selfieSegmentationScreen.view.SelfieSegmentation
+import com.example.machinelearningkit.ui.screens.textRecognitionScreen.view.TextRecognition
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.face.Face
 import com.google.mlkit.vision.objects.DetectedObject
 import com.google.mlkit.vision.pose.Pose
+import com.google.mlkit.vision.segmentation.SegmentationMask
+import com.google.mlkit.vision.text.Text
 
 @ExperimentalPermissionsApi
 @Composable
@@ -44,7 +48,9 @@ fun CameraView(
     poseDetection:Boolean = false,
     faceDetection:Boolean = false,
     barcodeScanner:Boolean = false,
-    objectDetection:Boolean = false
+    objectDetection:Boolean = false,
+    selfieSegmentation:Boolean = false,
+    textRecognition:Boolean = false
 ) {
 
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -54,6 +60,8 @@ fun CameraView(
     var detectedPose by remember { mutableStateOf<Pose?>(null) }
     var detectedBarcode by remember { mutableStateOf<List<Barcode>?>(null) }
     var detectionObject by remember { mutableStateOf<List<DetectedObject>?>(null) }
+    var detectionSelfieMask by remember { mutableStateOf<SegmentationMask?>(null) }
+    var detectionTextRecognition by remember { mutableStateOf<Text?>(null) }
     var sourceInfo by remember { mutableStateOf(SourceInfo(10, 10, false)) }
     
     val previewView = remember { PreviewView(context) }
@@ -68,11 +76,15 @@ fun CameraView(
                 faceDetection = faceDetection,
                 barcodeScanner = barcodeScanner,
                 objectDetection = objectDetection,
+                selfieSegmentation = selfieSegmentation,
+                textRecognition = textRecognition,
                 setSourceInfo = { sourceInfo = it },
                 onFacesDetected = { detectedFaces = it },
                 onPoseDetected = { detectedPose = it },
                 onBarcodeDetected = { detectedBarcode = it },
-                onObjectDetected = { detectionObject = it }
+                onObjectDetected = { detectionObject = it },
+                onSelfieSegmentation = { detectionSelfieMask = it },
+                onTextRecognition = { detectionTextRecognition = it }
             )
     }
 
@@ -107,6 +119,12 @@ fun CameraView(
                 }
                 if(objectDetection){
                     DetectedObject(detectedObjects = detectionObject, sourceInfo = sourceInfo)
+                }
+                if (selfieSegmentation){
+                    SelfieSegmentation(segmentationMask = detectionSelfieMask, sourceInfo = sourceInfo)
+                }
+                if (textRecognition){
+                    TextRecognition(text = detectionTextRecognition, sourceInfo = sourceInfo)
                 }
             }
         }
@@ -150,11 +168,15 @@ private fun ListenableFuture<ProcessCameraProvider>.configureCamera(
     faceDetection:Boolean,
     barcodeScanner:Boolean,
     objectDetection:Boolean,
+    selfieSegmentation:Boolean,
+    textRecognition:Boolean,
     setSourceInfo: (SourceInfo) -> Unit,
     onFacesDetected: (List<Face>) -> Unit,
     onPoseDetected: (Pose) -> Unit,
     onBarcodeDetected:(List<Barcode>) -> Unit,
-    onObjectDetected:(List<DetectedObject>) -> Unit
+    onObjectDetected:(List<DetectedObject>) -> Unit,
+    onSelfieSegmentation:(SegmentationMask) -> Unit,
+    onTextRecognition:(Text) -> Unit
 ): ListenableFuture<ProcessCameraProvider> {
     addListener({
         val cameraSelector = CameraSelector.Builder().requireLensFacing(cameraLens).build()
@@ -172,10 +194,14 @@ private fun ListenableFuture<ProcessCameraProvider>.configureCamera(
             barcodeScanner = barcodeScanner,
             setSourceInfo = setSourceInfo,
             objectDetection = objectDetection,
+            selfieSegmentation = selfieSegmentation,
+            textRecognition = textRecognition,
             onFacesDetected = onFacesDetected,
             onPoseDetected = onPoseDetected,
             onBarcodeDetected = onBarcodeDetected,
-            onObjectDetected = onObjectDetected
+            onObjectDetected = onObjectDetected,
+            onSelfieSegmentation = onSelfieSegmentation,
+            onTextRecognition = onTextRecognition
         )
 
         val imageCapture = ImageCapture.Builder()
@@ -189,7 +215,7 @@ private fun ListenableFuture<ProcessCameraProvider>.configureCamera(
                 bindToLifecycle(lifecycleOwner, cameraSelector, analysis, imageCapture)
             }
         } catch (exc: Exception) {
-            TODO("process errors")
+
         }
     }, ContextCompat.getMainExecutor(context))
     return this

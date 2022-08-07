@@ -1,9 +1,9 @@
 package com.example.machinelearningkit.ui.screens.mainScreen
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -60,15 +60,30 @@ fun MainScreen(
         ButtonData(
             name = "Detect, track and classify objects in static camera",
             onClick = { navController.navigate(Screen.ObjectDetectionScreen.arguments(false)) }
+        ),
+        ButtonData(
+            name = "Text recognition static camera",
+            onClick = { navController.navigate(Screen.TextRecognitionScreen.arguments(false))}
+        ),
+        ButtonData(
+            name = "Text recognition live camera",
+            onClick = { navController.navigate(Screen.TextRecognitionScreen.arguments(true))}
+        ),
+        ButtonData(
+            name = "Selfie Segmentation live camera",
+            onClick = { navController.navigate(Screen.SelfieSegmentationScreen.arguments(true)) }
+        ),
+        ButtonData(
+            name = "Selfie Segmentation static camera",
+            onClick = { navController.navigate(Screen.SelfieSegmentationScreen.arguments(false)) }
         )
     )
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
+    LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        buttonData.forEach { item ->
+        items(buttonData) { item ->
             OutlinedButton(
                 modifier = Modifier.padding(10.dp),
                 onClick = item.onClick

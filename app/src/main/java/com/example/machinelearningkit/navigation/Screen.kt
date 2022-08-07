@@ -26,4 +26,14 @@ sealed class Screen(val route:String){
             imageId:String
         ):String = "object_static_detection_screen/$imageId"
     }
+    object SelfieSegmentationScreen:Screen("selfie_segmentation_screen?live_detection={live_detection}"){
+        fun arguments(
+            liveDetection:Boolean
+        ):String = "selfie_segmentation_screen?live_detection=$liveDetection"
+    }
+    object TextRecognitionScreen:Screen("text_recognition_screen?live_detection={live_detection}"){
+        fun arguments(
+            liveDetection:Boolean
+        ):String = "text_recognition_screen?live_detection=$liveDetection"
+    }
 }

@@ -27,6 +27,9 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBI7Q92hZqhLszNAc2i3OkwsjmHjUQx6wY" />
 
+        <activity android:name="com.canhub.cropper.CropImageActivity"
+            android:theme="@style/Base.Theme.AppCompat"/>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

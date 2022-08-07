@@ -4,17 +4,16 @@ import android.util.Log
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
-import com.example.machinelearningkit.ui.view.camera.detection.BarcodeScannerProcessor
-import com.example.machinelearningkit.ui.view.camera.detection.FaceDetectorProcessor
-import com.example.machinelearningkit.ui.view.camera.detection.ObjectDetectionProcessor
+import com.example.machinelearningkit.ui.view.camera.detection.*
 import com.example.machinelearningkit.ui.view.camera.model.SourceInfo
-import com.example.machinelearningkit.ui.view.camera.detection.PoseDetectorProcessor
 import com.google.android.gms.tasks.TaskExecutors
 import com.google.mlkit.common.MlKitException
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.face.Face
 import com.google.mlkit.vision.objects.DetectedObject
 import com.google.mlkit.vision.pose.Pose
+import com.google.mlkit.vision.segmentation.SegmentationMask
+import com.google.mlkit.vision.text.Text
 
 fun bindAnalysisUseCase(
     lens: Int,
@@ -22,12 +21,38 @@ fun bindAnalysisUseCase(
     faceDetection:Boolean,
     barcodeScanner:Boolean,
     objectDetection:Boolean,
+    selfieSegmentation:Boolean,
+    textRecognition:Boolean,
     setSourceInfo: (SourceInfo) -> Unit,
     onFacesDetected: (List<Face>) -> Unit,
     onPoseDetected: (Pose) -> Unit,
     onBarcodeDetected:(List<Barcode>) -> Unit,
-    onObjectDetected:(List<DetectedObject>) -> Unit
+    onObjectDetected:(List<DetectedObject>) -> Unit,
+    onSelfieSegmentation:(SegmentationMask) -> Unit,
+    onTextRecognition:(Text) -> Unit
 ): ImageAnalysis? {
+
+    val textRecognitionProcessor = try {
+        if (textRecognition){
+            TextRecognitionProcessor()
+        }else{
+            null
+        }
+    }catch (e:Exception){
+        Log.e("CAMERA", "Can not create image processor", e)
+        return null
+    }
+
+    val selfieSegmentationProcessor = try {
+        if (selfieSegmentation){
+            SelfieSegmentationProcessor()
+        }else{
+            null
+        }
+    }catch (e:Exception){
+        Log.e("CAMERA", "Can not create image processor", e)
+        return null
+    }
 
     val objectProcessor = try {
         if (objectDetection){
@@ -97,6 +122,12 @@ fun bindAnalysisUseCase(
             }
             objectProcessor?.let {
                 objectProcessor.liveProcessImageProxy(imageProxy,onObjectDetected)
+            }
+            selfieSegmentationProcessor?.let {
+                selfieSegmentationProcessor.processImageProxy(imageProxy, onSelfieSegmentation)
+            }
+            textRecognitionProcessor?.let {
+                textRecognitionProcessor.processImageProxy(imageProxy, onTextRecognition)
             }
         } catch (e: MlKitException) {
             Log.e(

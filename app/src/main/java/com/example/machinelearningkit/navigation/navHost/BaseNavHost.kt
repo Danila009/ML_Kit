@@ -19,7 +19,9 @@ import com.example.machinelearningkit.ui.screens.objectDetectionScreen.ObjectDet
 import com.example.machinelearningkit.ui.screens.objectStaticDetectionScreen.ObjectStaticDetectionScreen
 import com.example.machinelearningkit.ui.screens.poseAndFaceDetectionScreen.PostAndFaceDetectionScreen
 import com.example.machinelearningkit.ui.screens.poseDetectionScreen.PoseDetectionScreen
+import com.example.machinelearningkit.ui.screens.selfieSegmentationScreen.SelfieSegmentationScreen
 import com.example.machinelearningkit.ui.screens.smartReplyScreen.SmartReplyScreen
+import com.example.machinelearningkit.ui.screens.textRecognitionScreen.TextRecognitionScreen
 import com.example.machinelearningkit.ui.screens.translationScreen.TranslationScreen
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 
@@ -107,6 +109,35 @@ fun BaseNavHost(
             ObjectStaticDetectionScreen(
                 navController = navController,
                 imageId = it.arguments?.getString(Arguments.ImageId.name).toString()
+            )
+        }
+
+        composable(
+            route = Screen.SelfieSegmentationScreen.route,
+            arguments = listOf(
+                navArgument(Arguments.LiveDetection.name){
+                    type = NavType.BoolType
+                }
+            )
+        ){
+            SelfieSegmentationScreen(
+                navController = navController,
+                liveDetection = it.arguments?.getBoolean(Arguments.LiveDetection.name) ?: false
+            )
+        }
+
+        composable(
+            route = Screen.TextRecognitionScreen.route,
+            arguments = listOf(
+                navArgument(Arguments.LiveDetection.name){
+                    type = NavType.BoolType
+                }
+            )
+
+        ){
+            TextRecognitionScreen(
+                navController = navController,
+                liveDetection = it.arguments?.getBoolean(Arguments.LiveDetection.name) ?: false
             )
         }
     }
